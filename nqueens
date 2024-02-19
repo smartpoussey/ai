@@ -1,0 +1,57 @@
+def is_safe(board, row, col):
+    # Check if there is a queen in the same column
+    for i in range(row):
+        if board[i] == col:
+            return False
+
+    # Check if there is a queen in the upper-left diagonal
+    for i, j in zip(range(row-1, -1, -1), range(col-1, -1, -1)):
+        if board[i] == j:
+            return False
+
+    # Check if there is a queen in the upper-right diagonal
+    for i, j in zip(range(row-1, -1, -1), range(col+1, len(board))):
+        if board[i] == j:
+            return False
+
+    return True
+
+def print_solution(board):
+    for row in board:
+        line = ['.'] * len(board)
+        line[row] = 'Q'
+        print(' '.join(line))
+    print()
+
+def bfs(n):
+    queue = [[]]
+    while queue:
+        board = queue.pop(0)
+        row = len(board)
+        if row == n:
+            print_solution(board)
+            continue
+        for col in range(n):
+            if is_safe(board, row, col):
+                queue.append(board + [col])
+
+def dfs_util(n, row, board):
+    if row == n:
+        print_solution(board)
+        return
+    for col in range(n):
+        if is_safe(board, row, col):
+            board.append(col)
+            dfs_util(n, row + 1, board)
+            board.pop()
+
+def dfs(n):
+    dfs_util(n, 0, [])
+
+# Example usage:
+n = 4
+print("BFS solutions for", n, "queens:")
+bfs(n)
+
+print("DFS solutions for", n, "queens:")
+dfs(n)
