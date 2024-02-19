@@ -1,0 +1,127 @@
+from collections import deque
+
+def bfs(graph, start, goal):
+    visited = set()
+    queue = deque([(start, [])])
+    visited.add(start)
+
+    while queue:
+        node, path = queue.popleft()
+        if node == goal:
+            return path + [node]
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                queue.append((neighbor, path + [node]))
+                visited.add(neighbor)
+    return None
+
+def dfs(graph, start, goal):
+    visited = set()
+    stack = [(start, [])]
+    visited.add(start)
+
+    while stack:
+        node, path = stack.pop()
+        if node == goal:
+            return path + [node]
+        for neighbor in reversed(graph.get(node, [])):
+            if neighbor not in visited:
+                stack.append((neighbor, path + [node]))
+                visited.add(neighbor)
+    return None
+
+def uniform_cost_search(graph, start, goal):
+    visited = set()
+    queue = deque([(0, start, [])])
+    visited.add(start)
+
+    while queue:
+        cost, node, path = queue.popleft()
+        if node == goal:
+            return path + [node]
+        for neighbor, neighbor_cost in graph.get(node, {}).items():
+            if neighbor not in visited:
+                queue.append((cost + neighbor_cost, neighbor, path + [node]))
+                visited.add(neighbor)
+    return None
+
+def bidirectional_search(graph, start, goal):
+    start_visited = set()
+    end_visited = set()
+    start_queue = deque([(start, [])])
+    end_queue = deque([(goal, [])])
+    start_visited.add(start)
+    end_visited.add(goal)
+
+    while start_queue and end_queue:
+        start_node, start_path = start_queue.popleft()
+        end_node, end_path = end_queue.popleft()
+        
+        if start_node in end_visited:
+            return start_path + [start_node] + end_path[::-1]
+        if end_node in start_visited:
+            return start_path[::-1] + [end_node] + end_path
+
+        for neighbor in graph.get(start_node, []):
+            if neighbor not in start_visited:
+                start_queue.append((neighbor, start_path + [start_node]))
+                start_visited.add(neighbor)
+        for neighbor in graph.get(end_node, []):
+            if neighbor not in end_visited:
+                end_queue.append((neighbor, end_path + [end_node]))
+                end_visited.add(neighbor)
+
+    return None
+
+def iterative_deepening_dfs(graph, start, goal):
+    for depth in range(len(graph)):
+        result = depth_limited_search(graph, start, goal, depth)
+        if result is not None:
+            return result
+    return None
+
+def depth_limited_search(graph, start, goal, depth_limit):
+    visited = set()
+
+    def dfs(node, path, depth):
+        if node == goal:
+            return path + [node]
+        if depth >= depth_limit:
+            return None
+        visited.add(node)
+        for neighbor in graph.get(node, []):
+            if neighbor not in visited:
+                result = dfs(neighbor, path + [node], depth + 1)
+                if result is not None:
+                    return result
+        return None
+
+    return dfs(start, [], 0)
+
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B', 'F'],
+    'F': ['C', 'E']
+}
+
+start_node = 'A'
+goal_node = 'F'
+
+print("BFS path from", start_node, "to", goal_node, ":", bfs(graph, start_node, goal_node))
+print("DFS path from", start_node, "to", goal_node, ":", dfs(graph, start_node, goal_node))
+print("Bidirectional Search path from", start_node, "to", goal_node, ":", bidirectional_search(graph, start_node, goal_node))
+print("Iterative Deepening DFS path from", start_node, "to", goal_node, ":", iterative_deepening_dfs(graph, start_node, goal_node))
+print("Depth-Limited Search path from", start_node, "to", goal_node, ":", depth_limited_search(graph, start_node, goal_node, 3))
+
+graph = {
+    'A': {'B': 1, 'C': 2},
+    'B': {'A': 1, 'D': 3, 'E': 4},
+    'C': {'A': 2, 'F': 5},
+    'D': {'B': 3},
+    'E': {'B': 4, 'F': 6},
+    'F': {'C': 5, 'E': 6}
+}
+print("Uniform Cost Search path from", start_node, "to", goal_node, ":", uniform_cost_search(graph, start_node, goal_node))
