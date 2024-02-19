@@ -1,0 +1,32 @@
+from collections import deque
+
+def measure_water():
+    # Initial state
+    initial_state = (0, 0)
+    visited = set()
+    queue = deque([(initial_state, [])])
+
+    # Breadth-first search
+    while queue:
+        state, actions = queue.popleft()
+        if 4 in state:
+            return actions
+        visited.add(state)
+
+        # Generate next states
+        x, y = state
+        next_states = [
+            (3, y), (x, 5),  # Fill jug x or y
+            (0, y), (x, 0),  # Empty jug x or y
+            (min(x + y, 3), max(0, x + y - 3)),  # Pour from y to x
+            (max(0, x + y - 5), min(x + y, 5))   # Pour from x to y
+        ]
+        for next_state in next_states:
+            if next_state not in visited:
+                queue.append((next_state, actions + [next_state]))
+
+    return "Cannot measure 4 liters using given jugs."
+
+# Run BFS to measure 4 liters
+result = measure_water()
+print("Steps to measure 4 liters:", result)
