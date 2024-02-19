@@ -1,0 +1,88 @@
+from collections import deque
+
+class Graph:
+    def __init__(self):
+        self.adj_list = {}
+
+    def add_edge(self, u, v):
+        if u not in self.adj_list:
+            self.adj_list[u] = []
+        if v not in self.adj_list:
+            self.adj_list[v] = []
+        self.adj_list[u].append(v)
+
+def bfs(graph, start):
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+
+    while queue:
+        node = queue.popleft()
+        print(node, end=' ')
+
+        if node in graph.adj_list:
+            for neighbor in graph.adj_list[node]:
+                if neighbor not in visited:
+                    queue.append(neighbor)
+                    visited.add(neighbor)
+
+class TreeNode:
+    def __init__(self, value):
+        self.val = value
+        self.children = []
+
+def dfs(node):
+    if not node:
+        return
+    print(node.val, end=' ')
+    for child in node.children:
+        dfs(child)
+
+
+def bfs_tree(root):
+    if not root:
+        return
+    visited = set()
+    queue = deque([root])
+    visited.add(root)
+
+    while queue:
+        node = queue.popleft()
+        print(node.val, end=' ')
+        for child in node.children:
+            if child not in visited:
+                queue.append(child)
+                visited.add(child)
+
+def dfs_graph(graph, start, visited=None):
+    if visited is None:
+        visited = set()
+    visited.add(start)
+    print(start, end=' ')
+
+    for neighbor in graph.adj_list.get(start, []):
+        if neighbor not in visited:
+            dfs_graph(graph, neighbor, visited)
+
+
+if __name__ == "__main__":
+    # Graph example
+    g = Graph()
+    g.add_edge(0, 1)
+    g.add_edge(0, 2)
+    g.add_edge(1, 2)
+    g.add_edge(2, 0)
+    g.add_edge(2, 3)
+    g.add_edge(3, 3)
+
+    print("BFS traversal of graph:")
+    bfs(g, 2)
+    print("\n")
+
+    # Tree example
+    root = TreeNode(1)
+    root.children = [TreeNode(2), TreeNode(3), TreeNode(4)]
+    root.children[0].children = [TreeNode(5), TreeNode(6)]
+
+    print("DFS traversal of tree:")
+    dfs(root)
