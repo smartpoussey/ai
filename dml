@@ -1,0 +1,35 @@
+def depth_limited_search(graph, start, goal, depth_limit):
+    visited = set()
+
+    def dfs(node, depth):
+        if node == goal:
+            return True
+        if depth >= depth_limit:
+            return False
+        if node not in visited:
+            visited.add(node)
+            for neighbor in graph.get(node, []):
+                if dfs(neighbor, depth + 1):
+                    return True
+        return False
+
+    return dfs(start, 0)
+
+# Example graph represented as an adjacency list
+graph = {
+    'A': ['B', 'C'],
+    'B': ['D', 'E'],
+    'C': ['F'],
+    'D': [],
+    'E': [],
+    'F': []
+}
+
+start_node = 'A'
+goal_node = 'F'
+depth_limit = 2
+
+if depth_limited_search(graph, start_node, goal_node, depth_limit):
+    print("Goal found within depth limit")
+else:
+    print("Goal not found within depth limit")
